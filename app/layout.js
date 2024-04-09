@@ -1,7 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar/Navbar";
-
+import Drawer from "@/components/drawer/Drawer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -13,11 +13,16 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <div className="firstboxnav">
         <Navbar/>
-        </div>
-        {children}
-        </body>
+        <main className="flex flex-row">
+          <div className="w-[380px]">
+            <Drawer />
+          </div>
+          <div className="mt-[75px]">
+            {children}
+          </div>
+        </main>
+      </body>
     </html>
   );
 }

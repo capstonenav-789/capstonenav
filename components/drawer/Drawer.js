@@ -29,7 +29,7 @@ const Drawer = () => {
             <Link href="/studentnames">STUDENT NAMES</Link>
           </li>
           <li>
-            <a href="/logout">LOGOUT</a>
+            <a href='#'>LOGOUT</a>
           </li>
         </ul>
       </nav>

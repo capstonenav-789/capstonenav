@@ -3,12 +3,7 @@ import React from 'react'
 
 const StudentNames = () => {
   return (
-    <main className="flex flex-row ">
-    <div className="w-[380px]">
-    <Drawer/>
-</div>
-    <div className='flex justify-center items-center mt-[80px]'> <h2> StudentNames page</h2></div>
-    </main>
+    <h2> StudentNames page</h2>
   )
 }
 
