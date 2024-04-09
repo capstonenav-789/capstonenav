@@ -1,0 +1,34 @@
+.drawer {
+    position: fixed;
+    top: 80px;
+    left: -250px; /* Initially hidden off-screen */
+    width: 305px;
+    height: calc(100% - 80px);
+    background-color: #115740;
+    transition: left 0.3s ease-in-out; /* Add a smooth transition */
+  }
+  
+  .open {
+    left: 0; /* Slide the drawer into view */
+  }
+  
+  .closed {
+    left: -250px; /* Hide the drawer off-screen */
+  }
+  
+  .nav ul {
+    list-style-type: none;
+    margin-top: 50px;
+  }
+  
+  .nav ul li {
+    padding: 10px;
+    margin-left: 15px;
+  }
+  
+  .nav ul li a {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 600;
+  }
