@@ -1,10 +1,10 @@
 // import Links from "./links/Links"
-import Link from "next/link"
+import Link from "next/link";
 import '../../app/globals.css';
 
 const Navbar = () => {
     return (
-      <div className="flex flex-row justify-between items-center mx-auto bg-[#115740]  h-[80px] pr-20">
+      <div className="flex flex-row justify-between items-center mx-auto bg-[#115740]  h-[80px] pr-20 navbarclass">
         <div className="atulogo h-[100px] bg-[#ffcc00] w-[400px] mt-3">
           <Link href="/" className="text-white text-2xl text-center ">
             {" "}

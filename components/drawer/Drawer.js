@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import styles from './Drawer.module.css';
+import Link from "next/link";
 
 const Drawer = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -10,22 +11,22 @@ const Drawer = () => {
       <nav className={styles.nav}>
         <ul>
           <li>
-            <a href="/">HOME</a>
+            <Link href="/">HOME</Link>
           </li>
           <li>
-            <a href="/aboutprofesser">ABOUT PROFESSOR</a>
+            <Link href="/aboutprofesser">ABOUT PROFESSOR</Link>
           </li>
           <li>
-            <a href="/nameofclass">NAME OF THE CLASS</a>
+            <Link href="/nameofclass">NAME OF THE CLASS</Link>
           </li>
           <li>
-            <a href="/projectnames">PROJECT NAMES</a>
+            <Link href="/projectnames">PROJECT NAMES</Link>
           </li>
           <li>
-            <a href="/projectsyear">PROJECTS YEAR</a>
+            <Link href="/projectsyear">PROJECTS YEAR</Link>
           </li>
           <li>
-            <a href="/studentnames">STUDENT NAMES</a>
+            <Link href="/studentnames">STUDENT NAMES</Link>
           </li>
           <li>
             <a href="/logout">LOGOUT</a>

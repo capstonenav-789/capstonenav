@@ -7,7 +7,7 @@ const StudentNames = () => {
     <div className="w-[380px]">
     <Drawer/>
 </div>
-    <div className='flex justify-center items-center'> <h2> StudentNames page</h2></div>
+    <div className='flex justify-center items-center mt-[80px]'> <h2> StudentNames page</h2></div>
     </main>
   )
 }

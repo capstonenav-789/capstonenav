@@ -6,7 +6,7 @@ export default function Home() {
       <div className="w-[380px]">
           <Drawer />
       </div>
-      <div>
+      <div className="mt-[100px] h-[590px] w-[780px]">
         {" "}
         <img
           src="/ATU_LOGO__OUTLINE_GR-YW_VERT.png"

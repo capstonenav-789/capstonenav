@@ -7,7 +7,7 @@ const ProjectNames = () => {
     <div className="w-[380px]">
     <Drawer/>
 </div>
-    <div className='flex justify-center items-center'> <h2> Project Names page</h2></div>
+    <div className='flex justify-center items-center mt-[80px]'> <h2> Project Names page</h2></div>
     </main>
   )
 }

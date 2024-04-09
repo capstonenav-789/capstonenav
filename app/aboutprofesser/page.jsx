@@ -8,7 +8,7 @@ const AboutProfessor = () => {
         <Drawer />
       </div>
       <div>
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center mt-[80px]">
             <div className="rounded-full">
             {" "}
             <img

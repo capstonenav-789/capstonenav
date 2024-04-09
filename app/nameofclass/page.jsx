@@ -7,7 +7,7 @@ const NameOfClass = () => {
     <div className="w-[380px]">
     <Drawer/>
 </div>
-<div className='flex justify-center items-center'> <h2> Name Of Class page</h2></div>
+<div className='flex justify-center items-center mt-[80px]'> <h2> Name Of Class page</h2></div>
 </main>
   )
 }
