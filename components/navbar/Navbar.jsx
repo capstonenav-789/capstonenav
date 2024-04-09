@@ -23,7 +23,7 @@ const Navbar = () => {
               Login
             </Link>
             <Link href="#" className="text-white text-[18px]">
-              SignUp{" "}
+              SignUp
             </Link>
           </div>
         </div>
