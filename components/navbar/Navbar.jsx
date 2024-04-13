@@ -17,14 +17,12 @@ const Navbar = () => {
           </div>
           <div className="marg">
             <Link
-              href="#"
+              href="/login"
               className="text-white text-[18px] mr-20  border-1 border-solid border-white"
             >
               Login
             </Link>
-            <Link href="#" className="text-white text-[18px]">
-              SignUp
-            </Link>
+            
           </div>
         </div>
       </div>
