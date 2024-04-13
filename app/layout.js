@@ -3,8 +3,10 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar/Navbar";
 import Drawer from "@/components/drawer/Drawer";
+import { Provider } from 'react-redux';
 import { usePathname } from "next/navigation";
 const inter = Inter({ subsets: ["latin"] });
+import { store } from '../store';
 
 // export const metadata = {
 //   title: "Create Next App",
@@ -25,7 +27,9 @@ export default function RootLayout({ children }) {
           </div>
           )}
           <div className="mt-[75px]">
+          <Provider store={store}>
             {children}
+            </Provider>
           </div>
         </main>
       </body>

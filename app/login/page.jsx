@@ -4,12 +4,19 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from '@/firebase';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchUserData } from '@/utils/fetchUserData';
+
+// store
+import {setCred} from '/store/slices/homeSlice';
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const dispatch = useDispatch();
   const router = useRouter();
 
   const handleSubmit = async(e) => {
@@ -19,6 +26,7 @@ export default function LoginPage() {
 
     // Email validation
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      dispatch(setCred({email: ''}));
       setEmailError('Please enter a valid email address.');
       isValid = false;
     } else {
@@ -27,6 +35,7 @@ export default function LoginPage() {
 
     // Password validation
     if (!password || password.length < 6) {
+      dispatch(setCred({password: ''}));
       setPasswordError('Password must be at least 6 characters long.');
       isValid = false;
     } else {
@@ -38,13 +47,49 @@ export default function LoginPage() {
     // If all validations pass, you can proceed with the login logic
     if (isValid) {
       const auth = getAuth(app);
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        console.log("user", userCredential.user);
-        router.push('/');
+      // try {
+      //   const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      //   const user = userCredential.user;
+      //   console.log("user", userCredential.user);
+      //   router.push('/');
       
-      } catch (error) {
+      // } 
+      try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log("sdzfad", user)
+      const additionalDetails = await fetchUserData(user.uid);
+      console.log('creds', user, additionalDetails);
+      dispatch(
+        setCred({
+          email: email,
+          password: password,
+          loggedIn: true,
+          class: additionalDetails.class,
+          firstName: additionalDetails.firstName,
+          lastName: additionalDetails.lastName,
+          middleName: additionalDetails.middleName,
+          phone: additionalDetails.phone,
+          roleNumber: additionalDetails.roleNumber,
+          userRole: additionalDetails.userRole,
+          dept: additionalDetails.dept ? additionalDetails.dept : '',
+          course: additionalDetails.course ? additionalDetails.course : '',
+        }),
+        router.push ("/")
+      );
+      // Fetch user data from Firestore
+      // const userData = await fetchUserData(user.uid);
+   
+      // Handle the user data as needed
+      // if (userData) {
+      //   console.log('User data:', userData);
+      //   // Proceed with further logic, e.g., store user data in Redux store
+      //   router.push ("/")
+      // } else {
+      //   console.log('User data not found');
+      // }
+    }
+      catch (error) {
         console.error('Error signing in:', error);
       }
     }
