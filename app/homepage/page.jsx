@@ -3,46 +3,49 @@
 import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState, useEffect } from 'react';
-// import { firestore } from '@/firebase';
+import { firestore } from '@/firebase';
 
-// import { doc, setDoc } from 'firebase/firestore';
+import { collection, getDocs } from "firebase/firestore"; 
 
 
-const coursesData = [
-  {
-    courseName: 'Introduction to Web Development',
-    description: 'Learn the basics of HTML, CSS, and JavaScript to build modern web applications.',
-  },
-  {
-    courseName: 'React Fundamentals',
-    description: 'Master React, a popular JavaScript library for building user interfaces.',
-  },
-  {
-    courseName: 'Node.js and Express',
-    description: 'Dive into server-side development with Node.js and the Express framework.',
-  },
-  // Add more course data here
-];
 
 const HomePage = () => {
-  // const [courses, setCourses] = useState([]);
-  // const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
- 
 
+  useEffect(() => {
+    const fetchDataFromFirebase = async () => {
+    const querySnapshot = await getDocs (collection (firestore, "courses"))
+    const data = [];
+    querySnapshot.forEach((doc) => {
+   data.push({ id: doc.id, ...doc.data()});
+    });
+    console.log("hsdj", data);
+    setCourses(data);
+    setLoading(false);
+  };
+
+  fetchDataFromFirebase();
+}, []);
 
   return (
     <>
-    {coursesData.map((course, index) => (
-    <Card className="w-full max-w-md mt-2.5" key={index}>
-      <CardHeader>
-        <CardTitle>{course.courseName}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <CardDescription>{course.description}</CardDescription>
-      </CardContent>
-    </Card>
-    ))}
+      <div className="flex flex-wrap">
+    <h1 className='text-2xl font-semibold'>Courses</h1>
+     {courses.map((course, index) => ( 
+     
+        <Card className="w-full max-w-md mt-2.5" key={index}>
+          <CardHeader>
+            <CardTitle>{course.coursename}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CardDescription></CardDescription>
+          </CardContent>
+        </Card>
+   
+   ))}
+    </div>
     </>
   )
 }
