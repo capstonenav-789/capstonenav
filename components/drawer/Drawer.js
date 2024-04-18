@@ -1,6 +1,6 @@
-"use client"
-import React, { useState } from 'react';
-import styles from './Drawer.module.css';
+"use client";
+import React, { useState } from "react";
+import styles from "./Drawer.module.css";
 import Link from "next/link";
 
 const Drawer = () => {
@@ -29,7 +29,7 @@ const Drawer = () => {
             <Link href="/studentnames">STUDENT NAMES</Link>
           </li>
           <li>
-            <a href='#'>LOGOUT</a>
+            <a href="#">LOGOUT</a>
           </li>
         </ul>
       </nav>

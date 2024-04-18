@@ -1,12 +1,12 @@
-"use client"
+"use client";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar/Navbar";
 import Drawer from "@/components/drawer/Drawer";
-import { Provider } from 'react-redux';
+import { Provider } from "react-redux";
 import { usePathname } from "next/navigation";
 const inter = Inter({ subsets: ["latin"] });
-import { store } from '../store';
+import { store } from "../store";
 
 // export const metadata = {
 //   title: "Create Next App",
@@ -15,21 +15,19 @@ import { store } from '../store';
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
-  const shouldRenderDrawer = pathname !== "/login"; 
+  const shouldRenderDrawer = pathname !== "/login";
   return (
     <html lang="en">
       <body>
-        <Navbar/>
+        <Navbar />
         <main className="flex flex-row inter">
           {shouldRenderDrawer && (
-          <div className="w-[380px]">
-            <Drawer />
-          </div>
+            <div className="w-[380px]">
+              <Drawer />
+            </div>
           )}
           <div className="mt-[75px]">
-          <Provider store={store}>
-            {children}
-            </Provider>
+            <Provider store={store}>{children}</Provider>
           </div>
         </main>
       </body>

@@ -1,49 +1,45 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { app } from '@/firebase';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchUserData } from '@/utils/fetchUserData';
+import { app } from "@/firebase";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUserData } from "@/utils/fetchUserData";
 
 // store
-import {setCred} from '/store/slices/homeSlice';
-
+import { setCred } from "/store/slices/homeSlice";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     let isValid = true;
-  
 
     // Email validation
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      dispatch(setCred({email: ''}));
-      setEmailError('Please enter a valid email address.');
+      dispatch(setCred({ email: "" }));
+      setEmailError("Please enter a valid email address.");
       isValid = false;
     } else {
-      setEmailError('');
+      setEmailError("");
     }
 
     // Password validation
     if (!password || password.length < 6) {
-      dispatch(setCred({password: ''}));
-      setPasswordError('Password must be at least 6 characters long.');
+      dispatch(setCred({ password: "" }));
+      setPasswordError("Password must be at least 6 characters long.");
       isValid = false;
     } else {
-      setPasswordError('');
+      setPasswordError("");
     }
 
-
-    
     // If all validations pass, you can proceed with the login logic
     if (isValid) {
       const auth = getAuth(app);
@@ -52,45 +48,48 @@ export default function LoginPage() {
       //   const user = userCredential.user;
       //   console.log("user", userCredential.user);
       //   router.push('/');
-      
-      // } 
-      try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      console.log("sdzfad", user)
-      const additionalDetails = await fetchUserData(user.uid);
-      console.log('creds', user, additionalDetails);
-      dispatch(
-        setCred({
-          email: email,
-          password: password,
-          loggedIn: true,
-          class: additionalDetails.class,
-          firstName: additionalDetails.firstName,
-          lastName: additionalDetails.lastName,
-          middleName: additionalDetails.middleName,
-          phone: additionalDetails.phone,
-          roleNumber: additionalDetails.roleNumber,
-          userRole: additionalDetails.userRole,
-          dept: additionalDetails.dept ? additionalDetails.dept : '',
-          course: additionalDetails.course ? additionalDetails.course : '',
-        }),
-        router.push ("/")
-      );
-      // Fetch user data from Firestore
-      // const userData = await fetchUserData(user.uid);
-   
-      // Handle the user data as needed
-      // if (userData) {
-      //   console.log('User data:', userData);
-      //   // Proceed with further logic, e.g., store user data in Redux store
-      //   router.push ("/")
-      // } else {
-      //   console.log('User data not found');
+
       // }
-    }
-      catch (error) {
-        console.error('Error signing in:', error);
+      try {
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const user = userCredential.user;
+        console.log("sdzfad", user);
+        const additionalDetails = await fetchUserData(user.uid);
+        console.log("creds", user, additionalDetails);
+        dispatch(
+          setCred({
+            email: email,
+            password: password,
+            loggedIn: true,
+            class: additionalDetails.class,
+            firstName: additionalDetails.firstName,
+            lastName: additionalDetails.lastName,
+            middleName: additionalDetails.middleName,
+            phone: additionalDetails.phone,
+            roleNumber: additionalDetails.roleNumber,
+            userRole: additionalDetails.userRole,
+            dept: additionalDetails.dept ? additionalDetails.dept : "",
+            course: additionalDetails.course ? additionalDetails.course : "",
+          }),
+          router.push("/")
+        );
+        // Fetch user data from Firestore
+        // const userData = await fetchUserData(user.uid);
+
+        // Handle the user data as needed
+        // if (userData) {
+        //   console.log('User data:', userData);
+        //   // Proceed with further logic, e.g., store user data in Redux store
+        //   router.push ("/")
+        // } else {
+        //   console.log('User data not found');
+        // }
+      } catch (error) {
+        console.error("Error signing in:", error);
       }
     }
   };
@@ -101,7 +100,10 @@ export default function LoginPage() {
         <h2 className="mb-8 text-3xl font-bold text-center text-gray-800">
           Login
         </h2>
-        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white shadow-md rounded px-8 pt-6 pb-8"
+        >
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -115,7 +117,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
-                emailError ? 'border-red-500' : ''
+                emailError ? "border-red-500" : ""
               }`}
               placeholder="Enter your email"
             />
@@ -136,7 +138,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
-                passwordError ? 'border-red-500' : ''
+                passwordError ? "border-red-500" : ""
               }`}
               placeholder="Enter your password"
             />

@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSelector, useDispatch } from 'react-redux';
-import { updateCred } from '../../store/slices/homeSlice';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSelector, useDispatch } from "react-redux";
+import { updateCred } from "../../store/slices/homeSlice";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const Profile = () => {
   const router = useRouter();
@@ -38,8 +38,6 @@ const Profile = () => {
 
   return (
     <div className="flex flex-col items-center">
-      
-
       <div className="w-full w-[500px] mt-8 mx-auto">
         <Label htmlFor="firstName">First Name*</Label>
         <Input
