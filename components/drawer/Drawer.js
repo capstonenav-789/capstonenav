@@ -2,34 +2,36 @@
 import React, { useState } from "react";
 import styles from "./Drawer.module.css";
 import Link from "next/link";
-
+import { Button } from "../ui/button";
+import { signOut } from 'firebase/auth';
+import { auth } from "@/firebase";
 const Drawer = () => {
   const [isOpen, setIsOpen] = useState(true);
-
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
   return (
     <div className={`${styles.drawer} ${isOpen ? styles.open : styles.closed}`}>
       <nav className={styles.nav}>
         <ul>
           <li>
-            <Link href="/">HOME</Link>
+            <Link href="/dashboard">HOME</Link>
           </li>
           <li>
             <Link href="/aboutprofesser">ABOUT PROFESSOR</Link>
           </li>
           <li>
-            <Link href="/nameofclass">NAME OF THE CLASS</Link>
+            <Link href="/classes">CLASSES</Link>
           </li>
           <li>
-            <Link href="/projectnames">PROJECT NAMES</Link>
+            <Link href="/projectnames">PROJECTS</Link>
           </li>
           <li>
-            <Link href="/projectsyear">PROJECTS YEAR</Link>
-          </li>
-          <li>
-            <Link href="/studentnames">STUDENT NAMES</Link>
-          </li>
-          <li>
-            <a href="#">LOGOUT</a>
+            <Button variant="link" size="link" onClick={handleLogout}>LOGOUT</Button>
           </li>
         </ul>
       </nav>

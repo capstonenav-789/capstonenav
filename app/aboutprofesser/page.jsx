@@ -3,15 +3,15 @@ import React from "react";
 const AboutProfessor = () => {
   return (
       <div>
-        <div className="flex justify-center items-center mt-[80px]">
+        <div className="flex justify-center items-center gap-20">
           <div className="rounded-full">
             <img
                 src="/proffeseer.jpg"
                 alt="Logo"
-                className="h-[450px] w-[340px] ml-[100px] rounded-full"
+                className="h-[450px] w-[340px] rounded-full"
             />
           </div>
-          <div className="p-20">
+          <div>
             <h2 className="text-5xl font-bold">
               Dr. Bandi AjayDevagan
             </h2>

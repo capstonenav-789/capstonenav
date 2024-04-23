@@ -2,7 +2,10 @@
 import Link from "next/link";
 import '../../app/globals.css';
 
+import { useAuthContext } from "@/utils/authContext";
+
 const Navbar = () => {
+  const { user } = useAuthContext();
     return (
       <div className="firstboxnav">
         <div className="flex flex-row justify-between items-center mx-auto bg-[#115740]  h-[80px] pr-20 navbarclass">
@@ -16,13 +19,20 @@ const Navbar = () => {
             </Link>
           </div>
           <div className="marg">
-            <Link
-              href="/login"
-              className="text-white text-[18px] mr-20  border-1 border-solid border-white"
-            >
-              Login
-            </Link>
-            
+            {!user?.uid ? 
+              <Link
+                href="/"
+                className="text-white text-[18px] border-1 border-solid border-white"
+              >
+                Login
+              </Link> 
+            : <Link
+            href="/"
+            className="text-white text-[18px] border-1 border-solid border-white"
+          >
+            My Profile
+          </Link> 
+            }
           </div>
         </div>
       </div>
