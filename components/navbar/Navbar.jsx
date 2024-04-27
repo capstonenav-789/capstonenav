@@ -27,7 +27,7 @@ const Navbar = () => {
                 Login
               </Link> 
             : <Link
-            href="/"
+            href="/profile"
             className="text-white text-[18px] border-1 border-solid border-white"
           >
             My Profile

@@ -61,21 +61,17 @@ export default function Home() {
           password
         );
         // const user = userCredential.user;
-
-        // dispatch(
+        // const additionalDetails = await fetchUserData(user.uid);
+        // await dispatch(
         //   setCred({
-        //     email: email,
-        //     password: password,
-        //     loggedIn: true,
-        //     class: additionalDetails.class,
-        //     firstName: additionalDetails.firstName,
-        //     lastName: additionalDetails.lastName,
-        //     middleName: additionalDetails.middleName,
-        //     phone: additionalDetails.phone,
-        //     roleNumber: additionalDetails.roleNumber,
-        //     userRole: additionalDetails.userRole,
-        //     dept: additionalDetails.dept ? additionalDetails.dept : "",
-        //     course: additionalDetails.course ? additionalDetails.course : "",
+        //     email: additionalDetails.email,
+        //     name: additionalDetails.name,
+        //     student_id: additionalDetails.student_id,
+        //     role: additionalDetails.role,
+        //     class_name: additionalDetails.class_name,
+        //     class_id: additionalDetails.class_id,
+        //     year: additionalDetails.year,
+        //     student_uid: user.uid,
         //   }),
         // );
         // toast({

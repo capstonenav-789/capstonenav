@@ -28,7 +28,10 @@ const Drawer = () => {
             <Link href="/classes">CLASSES</Link>
           </li>
           <li>
-            <Link href="/projectnames">PROJECTS</Link>
+            <Link href="/projects">PROJECTS</Link>
+          </li>
+          <li>
+            <Link href="/project-name">PROJECT NAME</Link>
           </li>
           <li>
             <Button variant="link" size="link" onClick={handleLogout}>LOGOUT</Button>

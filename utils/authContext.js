@@ -24,29 +24,32 @@ export const AuthContextProvider = ({ children }) => {
   const router = useRouter();
   const { toast } = useToast()
   const pathname = usePathname();
-  const shouldNotRefresh = pathname === "/student";
+  const shouldRefresh = pathname === "/";
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (shouldNotRefresh) return;
       setLoading(true)
       if (user) {
         console.log("user", user);
         const additionalDetails = await fetchUserData(user.uid);
         dispatch(
-          setCred({
-            email: additionalDetails.email,
-            name: additionalDetails.name,
-            student_id: additionalDetails.student_id,
-            userRole: additionalDetails.role,
-            class_name: additionalDetails.class_name,
-            class_id: additionalDetails.class_id,
-          }),
-        );
+            setCred({
+              email: additionalDetails.email,
+              name: additionalDetails.name,
+              student_id: additionalDetails.student_id,
+              role: additionalDetails.role,
+              class_name: additionalDetails.class_name,
+              class_id: additionalDetails.class_id,
+              year: additionalDetails.year,
+              student_uid: user.uid,
+            }),
+          );
         toast({
           title: "Login Successful....",
           description: "Welcome to capstonenav!",
         })
-        router.push("/dashboard")
+        if (shouldRefresh) {
+          router.push("/dashboard")
+        }
         setUser(user)
       } else {
         console.log("no auth")

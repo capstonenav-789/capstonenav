@@ -2,7 +2,7 @@
 import { firestore, auth } from '@/firebase';
 import { collection, query, where, getDocs, doc, addDoc, updateDoc, deleteDoc, setDoc,  limit, startAfter } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -31,6 +31,7 @@ export default function Student() {
   const searchParams = useSearchParams();
   const class_id = searchParams.get('class_id');
   const class_name = searchParams.get('class_name');
+  const router = useRouter();
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -236,8 +237,8 @@ export default function Student() {
               <TableCell>{student.role}</TableCell>
               <TableCell>{student.student_id}</TableCell>
               <TableCell>
-                <Button onClick={() => router.push(`/project?class_id=${class_id}&student_id=${student.id}`)} className="mr-2">
-                  Show
+                <Button onClick={() => router.push(`/projects?q_class_id=${class_id}&q_student_id=${student.id}`)} className="mr-2">
+                  View Projects
                 </Button>
                 <Button onClick={() => editStudent(student)} className="mr-2">
                   Edit
@@ -250,7 +251,7 @@ export default function Student() {
           ))}
         </TableBody>
       </Table>
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-end mt-4">
         <Button onClick={fetchPreviousStudents} disabled={!hasPrevious} className="mr-2">
           Previous
         </Button>

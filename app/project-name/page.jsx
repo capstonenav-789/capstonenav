@@ -8,10 +8,11 @@ import { Input } from '@/components/ui/input';
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const LIMIT = 10;
 
-export default function Classes() {
+export default function ProjectName() {
   const [classes, setClasses] = useState([]);
   const [lastDoc, setLastDoc] = useState(null);
   const [firstDoc, setFirstDoc] = useState(null);
@@ -19,32 +20,47 @@ export default function Classes() {
   const [hasPrevious, setHasPrevious] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [newClassName, setNewClassName] = useState('');
-  const [newClassDescription, setNewClassDescription] = useState('');
   const [editingClass, setEditingClass] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [classToDelete, setClassToDelete] = useState(null);
-
+  const [courses, setCourses] = useState([])
+  const [selectedCourses, setSelectedCourses] = useState("")
   const router = useRouter();
 
   useEffect(() => {
     const fetchClasses = async () => {
-      const classesQuery = query(collection(firestore, 'classes'), limit(LIMIT));
+      const classesQuery = query(collection(firestore, 'projectname'), limit(LIMIT));
       const querySnapshot = await getDocs(classesQuery);
-      const classesData = querySnapshot.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
+      const classesData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setClasses(classesData);
       setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
       setFirstDoc(querySnapshot.docs[0]);
       setNoMore(querySnapshot.docs.length < LIMIT);
       setHasPrevious(false);
     };
+    const fetchCourse = async () => {
+      try {
+        const projectsCollection = query(collection(firestore, 'courses'));
+        const projectsSnapshot = await getDocs(projectsCollection);
+        const projectsList = projectsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setCourses(projectsList);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    };
+
     fetchClasses();
+    fetchCourse();
   }, []);
 
   const fetchMoreClasses = async () => {
     if (noMore) return;
-    const nextQuery = query(collection(firestore, 'classes'), startAfter(lastDoc), limit(LIMIT));
+    const nextQuery = query(collection(firestore, 'projectname'), startAfter(lastDoc), limit(LIMIT));
     const querySnapshot = await getDocs(nextQuery);
-    const newClasses = querySnapshot.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
+    const newClasses = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     setClasses((prevClasses) => [...prevClasses, ...newClasses]);
     setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
     setFirstDoc(querySnapshot.docs[0]);
@@ -54,9 +70,9 @@ export default function Classes() {
 
   const fetchPreviousClasses = async () => {
     if (!hasPrevious) return;
-    const prevQuery = query(collection(firestore, 'classes'), endBefore(firstDoc), limitToLast(LIMIT));
+    const prevQuery = query(collection(firestore, 'projectname'), endBefore(firstDoc), limitToLast(LIMIT));
     const querySnapshot = await getDocs(prevQuery);
-    const prevClasses = querySnapshot.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
+    const prevClasses = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     setClasses(prevClasses);
     setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
     setFirstDoc(querySnapshot.docs[0]);
@@ -66,17 +82,21 @@ export default function Classes() {
 
   const createNewClass = async () => {
     try {
-      const docRef = await addDoc(collection(firestore, 'classes'), {
-        classname: newClassName,
-        description: newClassDescription,
+      console.log("selectedCourses",selectedCourses)
+      let course_name = courses.filter((item) => item.id === selectedCourses)[0]
+      console.log("course_name", course_name)
+      const docRef = await addDoc(collection(firestore, 'projectname'), {
+        name: newClassName,
+        course_id: selectedCourses,
+        course_name: course_name.name
       });
       console.log('Document written with ID: ', docRef.id);
       setClasses((prevClasses) => [
         ...prevClasses,
-        { uid: docRef.id, classname: newClassName, description: newClassDescription },
+        { id: docRef.id, name: newClassName, course_id: selectedCourses, course_name: course_name.name },
       ]);
       setNewClassName('');
-      setNewClassDescription('');
+      setSelectedCourses('')
       setIsSheetOpen(false);
     } catch (e) {
       console.error('Error adding document: ', e);
@@ -85,27 +105,29 @@ export default function Classes() {
 
   const editClass = (classItem) => {
     setEditingClass(classItem);
-    setNewClassName(classItem.classname);
-    setNewClassDescription(classItem.description);
+    setNewClassName(classItem.name);
+    setSelectedCourses(classItem.course_id)
     setIsSheetOpen(true);
   };
 
   const updateClass = async () => {
     try {
-      const classRef = doc(firestore, 'classes', editingClass.uid);
+      let course_name = courses.filter((item) => item.id === selectedCourses)[0]
+      const classRef = doc(firestore, 'projectname', editingClass.id);
       await updateDoc(classRef, {
-        classname: newClassName,
-        description: newClassDescription,
+        name: newClassName,
+        course_id: selectedCourses,
+        course_name: course_name.name
       });
       console.log('Document updated successfully');
       setClasses((prevClasses) =>
         prevClasses.map((item) =>
-          item.uid === editingClass.uid ? { uid: item.uid, classname: newClassName, description: newClassDescription } : item
+          item.uid === editingClass.uid ? { id: item.uid, name: newClassName, course_id: selectedCourses, course_name: course_name.name } : item
         )
       );
       setEditingClass(null);
       setNewClassName('');
-      setNewClassDescription('');
+      setSelectedCourses('');
       setIsSheetOpen(false);
       // Optionally, you can refetch the classes after updating
       // fetchClasses();
@@ -121,10 +143,10 @@ export default function Classes() {
 
   const deleteClass = async () => {
     try {
-      const classRef = doc(firestore, 'classes', classToDelete.uid);
+      const classRef = doc(firestore, 'projectname', classToDelete.id);
       await deleteDoc(classRef);
       console.log('Document deleted successfully');
-      setClasses((prevClasses) => prevClasses.filter((item) => item.uid !== classToDelete.uid));
+      setClasses((prevClasses) => prevClasses.filter((item) => item.id !== classToDelete.id));
       setClassToDelete(null);
       setIsDeleteDialogOpen(false);
       // Optionally, you can refetch the classes after deleting
@@ -134,32 +156,33 @@ export default function Classes() {
     }
   };
 
+  const handleSelectChange = (value) => {
+    setSelectedCourses(value);
+  };
+
   return (
     <div className="">
 
         <div className='flex items-center justify-between'>
-          <h1 className="text-3xl font-bold mb-4">Classes</h1>
+          <h1 className="text-3xl font-bold mb-4">Project Names</h1>
           <div className="mb-4">
-            <Button onClick={() => setIsSheetOpen(true)}>Create New Class</Button>
+            <Button onClick={() => setIsSheetOpen(true)}>Create New Project Name</Button>
           </div>
         </div>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead>Description</TableHead>
+              <TableHead>Course</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {classes.map((classItem) => (
-              <TableRow key={classItem.uid}>
-                <TableCell>{classItem.classname}</TableCell>
-                <TableCell>{classItem.description}</TableCell>
+              <TableRow key={classItem.id}>
+                <TableCell>{classItem.name}</TableCell>
+                <TableCell>{classItem.course_name}</TableCell>
                 <TableCell>
-                  <Button onClick={() => router.push(`/student?class_id=${classItem.uid}&&class_name=${classItem.classname}`)} className="mr-2">
-                    Show
-                  </Button>
                   <Button onClick={() => editClass(classItem)} className="mr-2">
                     Edit
                   </Button>
@@ -176,7 +199,7 @@ export default function Classes() {
             Previous
           </Button>
           <Button onClick={fetchMoreClasses} disabled={noMore}>
-            {noMore ? 'No more classes' : 'Next'}
+            {noMore ? 'No more project names' : 'Next'}
           </Button>
         </div>
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -190,11 +213,18 @@ export default function Classes() {
               />
             </div>
             <div className="mb-4">
-              <Input
-                placeholder="Class Description"
-                value={newClassDescription}
-                onChange={(e) => setNewClassDescription(e.target.value)}
-              />
+              <Select value={selectedCourses} onValueChange={handleSelectChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a Course" />
+                </SelectTrigger>
+                <SelectContent>
+                  {courses.map((course) => (
+                    <SelectItem key={course.id} value={course.id}>
+                      {course.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex justify-end">
               <Button onClick={editingClass ? updateClass : createNewClass}>
@@ -205,7 +235,7 @@ export default function Classes() {
         </Sheet>
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <DialogContent>
-            <div className="mb-4">Are you sure you want to delete this class?</div>
+            <div className="mb-4">Are you sure you want to delete this Project Name?</div>
             <div className="flex justify-end">
               <Button onClick={() => setIsDeleteDialogOpen(false)} className="mr-2">
                 Cancel
