@@ -1,5 +1,5 @@
 "use client"
-import { getDocs, collection, query, limit, startAfter, startAt, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getDocs, collection, query, limit, startAfter, startAt, addDoc, doc, updateDoc, deleteDoc, endBefore, limitToLast, orderBy } from 'firebase/firestore';
 import { firestore } from "@/firebase";
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 
-const LIMIT = 10;
+const LIMIT = 3;
 
 export default function Classes() {
   const [classes, setClasses] = useState([]);
@@ -23,12 +23,13 @@ export default function Classes() {
   const [editingClass, setEditingClass] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [classToDelete, setClassToDelete] = useState(null);
+  const [page, setPage] = useState(0)
 
   const router = useRouter();
 
   useEffect(() => {
     const fetchClasses = async () => {
-      const classesQuery = query(collection(firestore, 'classes'), limit(LIMIT));
+      const classesQuery = query(collection(firestore, 'classes'), orderBy("classname", "desc"), limit(LIMIT));
       const querySnapshot = await getDocs(classesQuery);
       const classesData = querySnapshot.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
       setClasses(classesData);
@@ -42,19 +43,31 @@ export default function Classes() {
 
   const fetchMoreClasses = async () => {
     if (noMore) return;
-    const nextQuery = query(collection(firestore, 'classes'), startAfter(lastDoc), limit(LIMIT));
+    let nextQuery
+    if (lastDoc) {
+      nextQuery = query(collection(firestore, 'classes'), orderBy("classname", "desc"), startAfter(lastDoc), limit(LIMIT));
+    } else {
+      nextQuery = query(collection(firestore, 'classes'), orderBy("classname", "desc"), limit(LIMIT));
+    }
     const querySnapshot = await getDocs(nextQuery);
     const newClasses = querySnapshot.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
-    setClasses((prevClasses) => [...prevClasses, ...newClasses]);
+    setClasses(newClasses);
     setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
     setFirstDoc(querySnapshot.docs[0]);
     setNoMore(querySnapshot.docs.length < LIMIT);
     setHasPrevious(true);
+    setPage((prevPage) => prevPage + 1)
   };
 
   const fetchPreviousClasses = async () => {
     if (!hasPrevious) return;
-    const prevQuery = query(collection(firestore, 'classes'), endBefore(firstDoc), limitToLast(LIMIT));
+    let prevQuery;
+    if (firstDoc) {
+
+      prevQuery = query(collection(firestore, 'classes'), orderBy("classname", "desc"), endBefore(firstDoc), limitToLast(LIMIT));
+    } else {
+      prevQuery = query(collection(firestore, 'classes'), orderBy("classname", "desc"), limit(LIMIT));
+    }
     const querySnapshot = await getDocs(prevQuery);
     const prevClasses = querySnapshot.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
     setClasses(prevClasses);
@@ -62,6 +75,7 @@ export default function Classes() {
     setFirstDoc(querySnapshot.docs[0]);
     setHasPrevious(querySnapshot.docs.length === LIMIT);
     setNoMore(false);
+    setPage((prevPage) => prevPage - 1)
   };
 
   const createNewClass = async () => {
@@ -172,7 +186,7 @@ export default function Classes() {
           </TableBody>
         </Table>
         <div className="flex justify-end mt-4">
-          <Button onClick={fetchPreviousClasses} disabled={!hasPrevious} className="mr-2">
+          <Button onClick={fetchPreviousClasses} disabled={!hasPrevious || page == 0} className="mr-2">
             Previous
           </Button>
           <Button onClick={fetchMoreClasses} disabled={noMore}>

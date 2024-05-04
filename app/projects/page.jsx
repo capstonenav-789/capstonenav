@@ -387,7 +387,7 @@ export default function Projects() {
   return (
     <div className="">
       <div className='flex items-center justify-between'>
-        <h1 className="text-3xl font-bold mb-4">Project Names</h1>
+        <h1 className="text-3xl font-bold mb-4">Projects</h1>
         <div className="mb-4">
           <Button onClick={() => setIsSheetOpen(true)}>Submit New Project</Button>
         </div>

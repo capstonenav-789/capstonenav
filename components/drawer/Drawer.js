@@ -28,6 +28,9 @@ const Drawer = () => {
             <Link href="/classes">CLASSES</Link>
           </li>
           <li>
+            <Link href="/courses">COURSES</Link>
+          </li>
+          <li>
             <Link href="/projects">PROJECTS</Link>
           </li>
           <li>

@@ -19,8 +19,20 @@ export default function Upload() {
   const [errors, setErrors] = useState({});
 
   const handleChange = (selectedYears) => {
-    setSelectedYears(selectedYears);
-  };
+      // Validate selected years format (only numbers and exactly 4 digits)
+      const validYears = selectedYears.filter((year) => /^\d{4}$/.test(year.label));
+      setSelectedYears(validYears);
+      
+      // Update errors based on validation
+      if (validYears.length !== selectedYears.length) {
+        setErrors({
+          ...errors,
+          years: "Enter valid years (only numbers, exactly 4 digits)",
+        });
+      } else {
+        setErrors({ ...errors, years: "" });
+      }
+    };
 
   // async function addToFireStoreDataBase(collectionName, data) {
   //   try {
@@ -87,6 +99,8 @@ export default function Upload() {
       // Commit the batch write
       await batch.commit();
       alert("Data uploaded successfully!");
+      setCourse("");
+      setSelectedYears("");
     } catch (error) {
       console.error("Error uploading data: ", error);
     }
@@ -94,10 +108,10 @@ export default function Upload() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!course || selectedYears.length === 0) {
+    if (!course || selectedYears.length === 0 || errors.years) {
       setErrors({
         course: !course ? "Course name is required" : "",
-        years: selectedYears.length === 0 ? "Select at least one year" : "",
+        years: selectedYears.length === 0 ? "Select at least one year" : errors.years,
       });
       return;
     }

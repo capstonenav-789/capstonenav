@@ -1,6 +1,6 @@
 "use client"
 import { firestore, auth } from '@/firebase';
-import { collection, query, where, getDocs, doc, addDoc, updateDoc, deleteDoc, setDoc,  limit, startAfter } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, addDoc, updateDoc, deleteDoc, setDoc,  limit, startAfter, endBefore, limitToLast } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react';
@@ -27,6 +27,8 @@ export default function Student() {
   const [editingStudent, setEditingStudent] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
+  const [years, setYears] = useState([]);
+  const [selectedYear, setSelectedYear] = useState("")
 
   const searchParams = useSearchParams();
   const class_id = searchParams.get('class_id');
@@ -60,7 +62,20 @@ export default function Student() {
       }
     };
 
+    const fetchYears = async () => {
+      try {
+        const projectsCollection = query(collection(firestore, 'Years'));
+        const projectsSnapshot = await getDocs(projectsCollection);
+        const projectsList = projectsSnapshot.docs.map((doc) => Number(doc.data().year)).sort((a, b) => b - a);
+        console.log("fetchYear",projectsList)
+        setYears(projectsList);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    };
+
     fetchStudents();
+    fetchYears()
   }, [class_id]);
 
   const fetchMoreStudents = async () => {
@@ -122,12 +137,13 @@ export default function Student() {
         email: newStudentEmail,
         role: newStudentRole,
         student_id: newStudentId,
-        class_id: class_id
+        class_id: class_id,
+        year: selectedYear,
       });
       console.log('Student updated successfully');
       setStudents((prevStudents) =>
         prevStudents.map((item) =>
-          item.id === editingStudent.id ? { id: item.id, name: newStudentName, email: newStudentEmail, role: newStudentRole, student_id: newStudentId, } : item
+          item.id === editingStudent.id ? { id: item.id, name: newStudentName, email: newStudentEmail, role: newStudentRole, student_id: newStudentId, year: selectedYear} : item
         )
       );
       setEditingStudent(null);
@@ -180,6 +196,7 @@ export default function Student() {
         role: newStudentRole,
         student_id: newStudentId,
         class_id: class_id,
+        year: selectedYear,
       };
       const docRef = doc(firestore, 'users', userId);
       await setDoc(docRef, newStudentData);
@@ -191,6 +208,7 @@ export default function Student() {
           email: newStudentEmail,
           role: newStudentRole,
           student_id: newStudentId,
+          year: selectedYear,
         }]);
       setNewStudentName('');
       setNewStudentEmail('');
@@ -203,6 +221,10 @@ export default function Student() {
       console.error('Error creating student: ', e);
     }
   };
+
+  const handleYearChange = (value) => {
+    setSelectedYear(value)
+  }
   
   return (
     <div className="container mx-auto py-8">
@@ -226,6 +248,7 @@ export default function Student() {
             <TableHead>Email</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Student ID</TableHead>
+            <TableHead>Year</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -236,6 +259,7 @@ export default function Student() {
               <TableCell>{student.email}</TableCell>
               <TableCell>{student.role}</TableCell>
               <TableCell>{student.student_id}</TableCell>
+              <TableCell>{student.year}</TableCell>
               <TableCell>
                 <Button onClick={() => router.push(`/projects?q_class_id=${class_id}&q_student_id=${student.id}`)} className="mr-2">
                   View Projects
@@ -297,6 +321,20 @@ export default function Student() {
                 onChange={(e) => setNewStudentId(e.target.value)}
                 required
               />
+            </div>
+            <div className="mb-4">
+              <Select value={selectedYear} onValueChange={handleYearChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((year) => (
+                    <SelectItem key={year} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex justify-end">
               <Button onClick={editingStudent ? updateStudent : createStudent}>

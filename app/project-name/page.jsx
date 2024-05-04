@@ -1,5 +1,5 @@
 "use client"
-import { getDocs, collection, query, limit, startAfter, startAt, addDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getDocs, collection, query, limit, startAfter, startAt, addDoc, doc, updateDoc, deleteDoc, limitToLast, endBefore } from 'firebase/firestore';
 import { firestore } from "@/firebase";
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
