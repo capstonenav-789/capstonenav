@@ -1,5 +1,5 @@
 "use client"
-import { getDocs, collection, query, limit, startAfter, startAt, addDoc, doc, updateDoc, deleteDoc, limitToLast, endBefore } from 'firebase/firestore';
+import { getDocs, collection, query, limit, startAfter, startAt, addDoc, doc, updateDoc, deleteDoc, limitToLast, endBefore, orderBy } from 'firebase/firestore';
 import { firestore } from "@/firebase";
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -26,10 +26,11 @@ export default function ProjectName() {
   const [courses, setCourses] = useState([])
   const [selectedCourses, setSelectedCourses] = useState("")
   const router = useRouter();
+  const [page, setPage] = useState(0)
 
   useEffect(() => {
     const fetchClasses = async () => {
-      const classesQuery = query(collection(firestore, 'projectname'), limit(LIMIT));
+      const classesQuery = query(collection(firestore, 'projectname'), orderBy("name", "desc"), limit(LIMIT));
       const querySnapshot = await getDocs(classesQuery);
       const classesData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setClasses(classesData);
@@ -58,19 +59,30 @@ export default function ProjectName() {
 
   const fetchMoreClasses = async () => {
     if (noMore) return;
-    const nextQuery = query(collection(firestore, 'projectname'), startAfter(lastDoc), limit(LIMIT));
+    let nextQuery;
+    if (lastDoc) {
+      nextQuery = query(collection(firestore, 'projectname'), orderBy("name", "desc"), startAfter(lastDoc), limit(LIMIT));
+    } else {
+      nextQuery = query(collection(firestore, 'projectname'), orderBy("name", "desc"), limit(LIMIT));
+    }
     const querySnapshot = await getDocs(nextQuery);
     const newClasses = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    setClasses((prevClasses) => [...prevClasses, ...newClasses]);
+    setClasses(newClasses);
     setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
     setFirstDoc(querySnapshot.docs[0]);
     setNoMore(querySnapshot.docs.length < LIMIT);
     setHasPrevious(true);
+    setPage((prevPage) => prevPage + 1)
   };
 
   const fetchPreviousClasses = async () => {
     if (!hasPrevious) return;
-    const prevQuery = query(collection(firestore, 'projectname'), endBefore(firstDoc), limitToLast(LIMIT));
+    let prevQuery;
+    if (firstDoc) {
+      prevQuery = query(collection(firestore, 'projectname'), orderBy("name", "desc"), endBefore(firstDoc), limitToLast(LIMIT));
+    } else {
+      prevQuery = query(collection(firestore, 'projectname'), orderBy("name", "desc"), limitToLast(LIMIT));
+    }
     const querySnapshot = await getDocs(prevQuery);
     const prevClasses = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     setClasses(prevClasses);
@@ -78,6 +90,7 @@ export default function ProjectName() {
     setFirstDoc(querySnapshot.docs[0]);
     setHasPrevious(querySnapshot.docs.length === LIMIT);
     setNoMore(false);
+    setPage((prevPage) => prevPage - 1)
   };
 
   const createNewClass = async () => {
@@ -149,8 +162,6 @@ export default function ProjectName() {
       setClasses((prevClasses) => prevClasses.filter((item) => item.id !== classToDelete.id));
       setClassToDelete(null);
       setIsDeleteDialogOpen(false);
-      // Optionally, you can refetch the classes after deleting
-      // fetchClasses();
     } catch (e) {
       console.error('Error deleting document: ', e);
     }
@@ -183,6 +194,9 @@ export default function ProjectName() {
                 <TableCell>{classItem.name}</TableCell>
                 <TableCell>{classItem.course_name}</TableCell>
                 <TableCell>
+                  <Button onClick={() => router.push(`/projects?q_project_id=${classItem.id}`)} className="mr-2">
+                    View Projects
+                  </Button>
                   <Button onClick={() => editClass(classItem)} className="mr-2">
                     Edit
                   </Button>
@@ -195,7 +209,7 @@ export default function ProjectName() {
           </TableBody>
         </Table>
         <div className="flex justify-end mt-4">
-          <Button onClick={fetchPreviousClasses} disabled={!hasPrevious} className="mr-2">
+          <Button onClick={fetchPreviousClasses} disabled={!hasPrevious || page == 0} className="mr-2">
             Previous
           </Button>
           <Button onClick={fetchMoreClasses} disabled={noMore}>

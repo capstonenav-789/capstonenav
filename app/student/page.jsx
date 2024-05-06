@@ -1,6 +1,6 @@
 "use client"
 import { firestore, auth } from '@/firebase';
-import { collection, query, where, getDocs, doc, addDoc, updateDoc, deleteDoc, setDoc,  limit, startAfter, endBefore, limitToLast } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, addDoc, updateDoc, deleteDoc, setDoc,  limit, startAfter, endBefore, limitToLast, orderBy } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react';
@@ -11,7 +11,7 @@ import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const LIMITS = 10;
+const LIMITS = 3;
 
 export default function Student() {
   const [students, setStudents] = useState([]);
@@ -29,6 +29,7 @@ export default function Student() {
   const [studentToDelete, setStudentToDelete] = useState(null);
   const [years, setYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState("")
+  const [page, setPage] = useState(0)
 
   const searchParams = useSearchParams();
   const class_id = searchParams.get('class_id');
@@ -44,6 +45,7 @@ export default function Student() {
           collection(firestore, 'users'),
           where('role', 'in', ['student', 'studentadmin']),
           where('class_id', '==', class_id),
+          orderBy("name", "desc"),
           limit(LIMITS)
         );
         const querySnapshot = await getDocs(usersQuery);
@@ -80,34 +82,59 @@ export default function Student() {
 
   const fetchMoreStudents = async () => {
     if (noMore) return;
-    const nextQuery = query(
-      collection(firestore, 'users'),
-      where('role', 'in', ['student', 'studentadmin']),
-      where('class_id', '==', class_id),
-      startAfter(lastDoc),
-      limit(LIMITS)
-    );
+    let nextQuery;
+    if (lastDoc) {
+      nextQuery = query(
+        collection(firestore, 'users'),
+        where('role', 'in', ['student', 'studentadmin']),
+        where('class_id', '==', class_id),
+        orderBy("name", "desc"),
+        startAfter(lastDoc),
+        limit(LIMITS)
+      );
+    } else {
+      nextQuery = query(
+        collection(firestore, 'users'),
+        where('role', 'in', ['student', 'studentadmin']),
+        where('class_id', '==', class_id),
+        orderBy("name", "desc"),
+        limit(LIMITS)
+      );
+    }
     const querySnapshot = await getDocs(nextQuery);
     const newStudents = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-    setStudents((prevStudents) => [...prevStudents, ...newStudents]);
+    setStudents(newStudents);
     setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
     setFirstDoc(querySnapshot.docs[0]);
     setNoMore(querySnapshot.docs.length < LIMITS);
     setHasPrevious(true);
+    setPage((prevPage) => prevPage + 1)
   };
 
   const fetchPreviousStudents = async () => {
     if (!hasPrevious) return;
-    const prevQuery = query(
-      collection(firestore, 'users'),
-      where('role', 'in', ['student', 'studentadmin']),
-      where('class_id', '==', class_id),
-      endBefore(firstDoc),
-      limitToLast(LIMITS)
-    );
+    let prevQuery;
+    if (firstDoc) {
+      prevQuery = query(
+        collection(firestore, 'users'),
+        where('role', 'in', ['student', 'studentadmin']),
+        where('class_id', '==', class_id),
+        orderBy("name", "desc"),
+        endBefore(firstDoc),
+        limitToLast(LIMITS)
+      );
+    } else {
+      prevQuery = query(
+        collection(firestore, 'users'),
+        where('role', 'in', ['student', 'studentadmin']),
+        where('class_id', '==', class_id),
+        orderBy("name", "desc"),
+        limitToLast(LIMITS)
+      );
+    }
     const querySnapshot = await getDocs(prevQuery);
     const prevStudents = querySnapshot.docs.map((doc) => ({
       id: doc.id,
@@ -118,6 +145,7 @@ export default function Student() {
     setFirstDoc(querySnapshot.docs[0]);
     setHasPrevious(querySnapshot.docs.length === LIMITS);
     setNoMore(false);
+    setPage((prevPage) => prevPage - 1)
   };
 
   const editStudent = (student) => {
@@ -138,6 +166,7 @@ export default function Student() {
         role: newStudentRole,
         student_id: newStudentId,
         class_id: class_id,
+        class_name: class_name,
         year: selectedYear,
       });
       console.log('Student updated successfully');
@@ -196,6 +225,7 @@ export default function Student() {
         role: newStudentRole,
         student_id: newStudentId,
         class_id: class_id,
+        class_name:class_name,
         year: selectedYear,
       };
       const docRef = doc(firestore, 'users', userId);
@@ -276,7 +306,7 @@ export default function Student() {
         </TableBody>
       </Table>
       <div className="flex justify-end mt-4">
-        <Button onClick={fetchPreviousStudents} disabled={!hasPrevious} className="mr-2">
+        <Button onClick={fetchPreviousStudents} disabled={!hasPrevious || page == 0} className="mr-2">
           Previous
         </Button>
         <Button onClick={fetchMoreStudents} disabled={noMore || lastDoc === null}>
@@ -310,7 +340,7 @@ export default function Student() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="student">Student</SelectItem>
-                  <SelectItem value="student admin">Student Admin</SelectItem>
+                  <SelectItem value="studentadmin">Student Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>

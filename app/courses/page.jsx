@@ -10,7 +10,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import CreatableSelect from "react-select/creatable";
 
-const LIMIT = 3;
+const LIMIT = 10;
 
 export default function Classes() {
   const [classes, setClasses] = useState([]);
@@ -410,10 +410,6 @@ export default function Classes() {
       console.error('Error deleting document: ', e);
     }
   };
-
-  console.log("coursesHash",coursesHash)
-  console.log("courses",courses)
-  console.log("selectedYears",selectedYears)
 
   return (
     <div className="">

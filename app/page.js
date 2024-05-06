@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/firebase";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUserData } from "@/utils/fetchUserData";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 // store
 import { setCred } from "/store/slices/homeSlice";
@@ -20,7 +22,26 @@ export default function Home() {
   const [loading, setLoading ] = useState(false)
   const dispatch = useDispatch();
   const router = useRouter();
-  const { toast } = useToast()
+  const { toast } = useToast();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+
+  const handlePassSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setMessage('Password reset email sent successfully.');
+    } catch (error) {
+      setMessage(`Error: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -152,14 +173,34 @@ export default function Home() {
               {loading ? "Loading..." : "Login" }
             </Button>
             <a
-              href="#"
-              className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
+              onClick={()=>setIsDeleteDialogOpen(true)}
+              className="inline-block cursor-pointer align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
             >
               Forgot Password?
             </a>
           </div>
         </form>
       </div>
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent>
+          <form onSubmit={handlePassSubmit} className="grid gap-4">
+            <div>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="Enter Your Email"
+              />
+            </div>
+            <Button type="submit" isLoading={isLoading}>
+              Reset Password
+            </Button>
+            {message && <p>{message}</p>}
+          </form>
+          </DialogContent>
+        </Dialog>
     </div>
   );
 }

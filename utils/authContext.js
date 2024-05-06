@@ -24,9 +24,11 @@ export const AuthContextProvider = ({ children }) => {
   const router = useRouter();
   const { toast } = useToast()
   const pathname = usePathname();
-  const shouldRefresh = pathname === "/";
+  console.log("pathname", pathname)
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (pathname === "/student") return;
       setLoading(true)
       if (user) {
         console.log("user", user);
@@ -47,7 +49,7 @@ export const AuthContextProvider = ({ children }) => {
           title: "Login Successful....",
           description: "Welcome to capstonenav!",
         })
-        if (shouldRefresh) {
+        if (pathname === "/") {
           router.push("/dashboard")
         }
         setUser(user)

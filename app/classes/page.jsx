@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 
-const LIMIT = 3;
+const LIMIT = 10;
 
 export default function Classes() {
   const [classes, setClasses] = useState([]);

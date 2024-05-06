@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useSelector, useDispatch } from "react-redux";
 import { useSearchParams, usePathname } from 'next/navigation';
 
-const LIMIT = 3;
+const LIMIT = 10;
 
 export default function Projects() {
 
@@ -468,6 +468,16 @@ export default function Projects() {
               ))}
             </SelectContent>
           </Select>
+          <Button onClick={() => {
+            setSelectedProjectName('default')
+            setSelectedClass('default')
+            setSelectedCourse('default')
+            setSelectedUser('default')
+            setSelectedYear('default')
+            router.push(pathname);
+          }} className="">
+            Reset
+          </Button>
       </div>
       <div className='overflow-auto	max-w-full'>
         <Table>
