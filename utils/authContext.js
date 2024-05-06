@@ -25,34 +25,34 @@ export const AuthContextProvider = ({ children }) => {
   const { toast } = useToast()
   const pathname = usePathname();
   console.log("pathname", pathname)
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (pathname === "/student") return;
       setLoading(true)
       if (user) {
-        console.log("user", user);
-        const additionalDetails = await fetchUserData(user.uid);
-        dispatch(
-            setCred({
-              email: additionalDetails.email,
-              name: additionalDetails.name,
-              student_id: additionalDetails.student_id,
-              role: additionalDetails.role,
-              class_name: additionalDetails.class_name,
-              class_id: additionalDetails.class_id,
-              year: additionalDetails.year,
-              student_uid: user.uid,
-            }),
-          );
-        toast({
-          title: "Login Successful....",
-          description: "Welcome to capstonenav!",
-        })
-        if (pathname === "/") {
+        if (window.location.pathname != "/student") {
+          console.log("user", user);
+          const additionalDetails = await fetchUserData(user.uid);
+          dispatch(
+              setCred({
+                email: additionalDetails.email,
+                name: additionalDetails.name,
+                student_id: additionalDetails.student_id,
+                role: additionalDetails.role,
+                class_name: additionalDetails.class_name,
+                class_id: additionalDetails.class_id,
+                year: additionalDetails.year,
+                student_uid: user.uid,
+              }),
+            );
+          setUser(user);
+          toast({
+            title: "Login Successful....",
+            description: "Welcome to capstonenav!",
+          });
+        }
+        if (window.location.pathname === "/") {
           router.push("/dashboard")
         }
-        setUser(user)
       } else {
         console.log("no auth")
         setUser(null);
