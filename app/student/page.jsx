@@ -11,7 +11,7 @@ import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const LIMITS = 3;
+const LIMITS = 10;
 
 export default function Student() {
   const [students, setStudents] = useState([]);
