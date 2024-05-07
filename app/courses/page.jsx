@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import CreatableSelect from "react-select/creatable";
+import useCheckUserRole from '@/utils/useCheckUserRole';
 
 const LIMIT = 10;
 
@@ -32,6 +33,8 @@ export default function Classes() {
   const [errors, setErrors] = useState({});
   const [coursesHash, setCoursesHash] = useState([])
   const [courses, setCourses] = useState([])
+
+  const { admin, manager, student } = useCheckUserRole(['admin', 'studentadmin', 'student']);
 
   const handleChange = (sel) => {
     setSelectedYears(sel);
@@ -417,12 +420,13 @@ export default function Classes() {
         <div className='flex items-center justify-between'>
           <h1 className="text-3xl font-bold mb-4">Courses</h1>
           <div className="mb-4">
+            {admin ?
             <Button onClick={() => {
               setIsSheetOpen(true);
               setEditingClass(null);
               setCourse("");
               setSelectedYears("");
-            }}>Create New Course</Button>
+            }}>Create New Course</Button> : null  }
           </div>
         </div>
         <Table>
@@ -447,12 +451,15 @@ export default function Classes() {
                   </>
                 ))}</TableCell>
                 <TableCell>
-                  <Button onClick={() => editClass(classItem)} className="mr-2">
-                    Edit
-                  </Button>
-                  <Button onClick={() => openDeleteDialog(classItem)} variant="destructive">
-                    Delete
-                  </Button>
+                  {admin ? 
+                  <>
+                    <Button onClick={() => editClass(classItem)} className="mr-2">
+                      Edit
+                    </Button>
+                    <Button onClick={() => openDeleteDialog(classItem)} variant="destructive">
+                      Delete
+                    </Button>
+                  </>: null }
                 </TableCell>
               </TableRow>
             ))}

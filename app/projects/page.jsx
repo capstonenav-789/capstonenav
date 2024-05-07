@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useSelector, useDispatch } from "react-redux";
 import { useSearchParams, usePathname } from 'next/navigation';
+import useCheckUserRole from '@/utils/useCheckUserRole';
 
 const LIMIT = 10;
 
@@ -49,6 +50,8 @@ export default function Projects() {
   const [selectedUser, setSelectedUser ] = useState(q_student_id ? q_student_id : "default")
   const [selectedYear, setSelectedYear ] = useState(q_year ? Number(q_year) : "default")
   const homeData = useSelector((state) => state.home);
+
+  const { admin, manager, student } = useCheckUserRole(['admin', 'studentadmin', 'student']);
 
   const router = useRouter();
   const pathname = usePathname()
@@ -389,7 +392,8 @@ export default function Projects() {
       <div className='flex items-center justify-between'>
         <h1 className="text-3xl font-bold mb-4">Projects</h1>
         <div className="mb-4">
-          <Button onClick={() => setIsSheetOpen(true)}>Submit New Project</Button>
+          {!admin ? 
+          <Button onClick={() => setIsSheetOpen(true)}>Submit New Project</Button> : null }
         </div>
       </div>
       <div className='flex items-center justify-between gap-4 mb-6'>
@@ -508,12 +512,15 @@ export default function Projects() {
                 <TableCell>{classItem.year}</TableCell>
                 <TableCell>{classItem.student_name}</TableCell>
                 <TableCell>
-                  <Button onClick={() => editClass(classItem)} className="mr-2 mb-2">
-                    Edit
-                  </Button>
-                  <Button onClick={() => openDeleteDialog(classItem)} variant="destructive">
-                    Delete
-                  </Button>
+                  {admin || classItem.student_id === homeData.student_uid ? 
+                  <>
+                    <Button onClick={() => editClass(classItem)} className="mr-2 mb-2">
+                      Edit
+                    </Button>
+                    <Button onClick={() => openDeleteDialog(classItem)} variant="destructive">
+                      Delete
+                    </Button>
+                  </> : null }
                 </TableCell>
               </TableRow>
             ))}

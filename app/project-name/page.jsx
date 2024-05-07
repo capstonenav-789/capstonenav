@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import useCheckUserRole from '@/utils/useCheckUserRole';
 
 const LIMIT = 10;
 
@@ -27,6 +28,8 @@ export default function ProjectName() {
   const [selectedCourses, setSelectedCourses] = useState("")
   const router = useRouter();
   const [page, setPage] = useState(0)
+
+  const { admin, manager, student } = useCheckUserRole(['admin', 'studentadmin', 'student']);
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -177,7 +180,8 @@ export default function ProjectName() {
         <div className='flex items-center justify-between'>
           <h1 className="text-3xl font-bold mb-4">Project Names</h1>
           <div className="mb-4">
-            <Button onClick={() => setIsSheetOpen(true)}>Create New Project Name</Button>
+            {admin ? 
+            <Button onClick={() => setIsSheetOpen(true)}>Create New Project Name</Button> : null }
           </div>
         </div>
         <Table>
@@ -197,12 +201,15 @@ export default function ProjectName() {
                   <Button onClick={() => router.push(`/projects?q_project_id=${classItem.id}`)} className="mr-2">
                     View Projects
                   </Button>
-                  <Button onClick={() => editClass(classItem)} className="mr-2">
-                    Edit
-                  </Button>
-                  <Button onClick={() => openDeleteDialog(classItem)} variant="destructive">
-                    Delete
-                  </Button>
+                  {admin ? 
+                  <>
+                    <Button onClick={() => editClass(classItem)} className="mr-2">
+                      Edit
+                    </Button>
+                    <Button onClick={() => openDeleteDialog(classItem)} variant="destructive">
+                      Delete
+                    </Button>
+                  </> : null }
                 </TableCell>
               </TableRow>
             ))}

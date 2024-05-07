@@ -32,7 +32,8 @@ export const AuthContextProvider = ({ children }) => {
         if (window.location.pathname != "/student") {
           console.log("user", user);
           const additionalDetails = await fetchUserData(user.uid);
-          dispatch(
+          if (additionalDetails) {
+            dispatch(
               setCred({
                 email: additionalDetails.email,
                 name: additionalDetails.name,
@@ -44,14 +45,15 @@ export const AuthContextProvider = ({ children }) => {
                 student_uid: user.uid,
               }),
             );
-          setUser(user);
-          toast({
-            title: "Login Successful....",
-            description: "Welcome to capstonenav!",
-          });
-        }
-        if (window.location.pathname === "/") {
-          router.push("/dashboard")
+            setUser(user);
+            toast({
+              title: "Login Successful....",
+              description: "Welcome to capstonenav!",
+            });
+            if (window.location.pathname === "/") {
+              router.push("/dashboard")
+            }
+          }
         }
       } else {
         console.log("no auth")

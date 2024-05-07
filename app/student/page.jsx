@@ -10,6 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import useCheckUserRole from '@/utils/useCheckUserRole';
+import { useSelector } from 'react-redux';
 
 const LIMITS = 10;
 
@@ -35,6 +37,9 @@ export default function Student() {
   const class_id = searchParams.get('class_id');
   const class_name = searchParams.get('class_name');
   const router = useRouter();
+  const homeData = useSelector((state) => state.home);
+
+  const { admin, manager, student } = useCheckUserRole(['admin', 'studentadmin', 'student']);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -261,6 +266,7 @@ export default function Student() {
       <div className='flex justify-between'>
         <h1 className="text-3xl font-bold mb-4">Students for Class: {class_name}</h1>
         <div className="mb-4">
+          {!student ? 
           <Button onClick={() => {
             setEditingStudent(null);
             setNewStudentName('');
@@ -268,7 +274,7 @@ export default function Student() {
             setNewStudentRole('student');
             setNewStudentId('');
             setIsSheetOpen(true)
-          }}>Create New Student</Button>
+          }}>Create New Student</Button> : null }
         </div>
       </div>
       <Table>
@@ -294,12 +300,14 @@ export default function Student() {
                 <Button onClick={() => router.push(`/projects?q_class_id=${class_id}&q_student_id=${student.id}`)} className="mr-2">
                   View Projects
                 </Button>
+                { admin || student.id === homeData.student_uid ? 
                 <Button onClick={() => editStudent(student)} className="mr-2">
                   Edit
-                </Button>
+                </Button> : null }
+                {admin ? 
                 <Button onClick={() => openDeleteDialog(student)} variant="destructive">
                   Delete
-                </Button>
+                </Button> : null}
               </TableCell>
             </TableRow>
           ))}
@@ -340,7 +348,7 @@ export default function Student() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="student">Student</SelectItem>
-                  <SelectItem value="studentadmin">Student Admin</SelectItem>
+                  {manager ? null : <SelectItem value="studentadmin">Student Admin</SelectItem>}
                 </SelectContent>
               </Select>
             </div>

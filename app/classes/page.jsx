@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
+import useCheckUserRole from '@/utils/useCheckUserRole';
 
 const LIMIT = 10;
 
@@ -26,6 +27,8 @@ export default function Classes() {
   const [page, setPage] = useState(0)
 
   const router = useRouter();
+
+  const { admin, manager, student } = useCheckUserRole(['admin', 'studentadmin', 'student']);
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -154,7 +157,8 @@ export default function Classes() {
         <div className='flex items-center justify-between'>
           <h1 className="text-3xl font-bold mb-4">Classes</h1>
           <div className="mb-4">
-            <Button onClick={() => setIsSheetOpen(true)}>Create New Class</Button>
+            { admin ? 
+            <Button onClick={() => setIsSheetOpen(true)}>Create New Class</Button> : null }
           </div>
         </div>
         <Table>
@@ -174,12 +178,15 @@ export default function Classes() {
                   <Button onClick={() => router.push(`/student?class_id=${classItem.uid}&&class_name=${classItem.classname}`)} className="mr-2">
                     Show
                   </Button>
-                  <Button onClick={() => editClass(classItem)} className="mr-2">
-                    Edit
-                  </Button>
-                  <Button onClick={() => openDeleteDialog(classItem)} variant="destructive">
-                    Delete
-                  </Button>
+                  { admin ? 
+                  <>
+                    <Button onClick={() => editClass(classItem)} className="mr-2">
+                      Edit
+                    </Button>
+                    <Button onClick={() => openDeleteDialog(classItem)} variant="destructive">
+                      Delete
+                    </Button>
+                  </> : null}
                 </TableCell>
               </TableRow>
             ))}
