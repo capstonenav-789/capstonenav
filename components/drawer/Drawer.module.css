@@ -1,40 +1,84 @@
+/* Drawer.module.css */
 .drawer {
-    position: fixed;
-    top: 80px;
-    left: -250px; /* Initially hidden off-screen */
-    width: 305px;
-    height: calc(100% - 80px);
-    background-color: #115740;
-    transition: left 0.3s ease-in-out; /* Add a smooth transition */
+  position: fixed;
+  top: 80px;
+  width: 305px;
+  height: calc(100% - 80px);
+  background-color: #115740;
+  transition: left 0.3s ease-in-out;
+  z-index: 50;
+}
+
+/* Desktop styles */
+.desktop {
+  left: 0;
+}
+
+.desktop.closed {
+  left: 0; /* Always visible on desktop */
+}
+
+/* Mobile styles */
+.mobile {
+  left: -305px; /* Initially hidden off-screen */
+}
+
+.mobile.open {
+  left: 0; /* Slide the drawer into view */
+}
+
+.mobile.closed {
+  left: -305px; /* Hide the drawer off-screen */
+}
+
+/* Close button for mobile */
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.nav ul {
+  list-style-type: none;
+  margin-top: 50px;
+  padding: 0;
+}
+
+.nav ul li {
+  padding: 10px;
+  margin-left: 15px;
+}
+
+.nav ul li a {
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 600;
+  display: block;
+}
+
+.nav ul li a:hover {
+  text-decoration: underline;
+  color: #ffffff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .drawer {
+    width: 280px; /* Slightly smaller on mobile */
   }
-  
-  .open {
-    left: 0; /* Slide the drawer into view */
+
+  .mobile {
+    left: -280px;
   }
-  
-  .closed {
-    left: -250px; /* Hide the drawer off-screen */
-  }
-  
-  .nav ul {
-    list-style-type: none;
-    margin-top: 50px;
-  }
-  
+
   .nav ul li {
-    padding: 10px;
-    margin-left: 15px;
+    padding: 12px 10px;
+    margin-left: 10px;
   }
-  
+
   .nav ul li a {
-    text-decoration: none;
-    color: #ffffff;
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 18px;
   }
-  .nav ul li a:hover {
-    text-decoration: underline;
-    color: #ffffff;
-    font-size: 20px;
-    font-weight: 600;
-  }
+}
