@@ -18,8 +18,8 @@ import { Input } from "@/components/ui/input";
 import { setCred } from "/store/slices/homeSlice";
 
 export default function Home() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("studentadmin@gmail.com");
+  const [password, setPassword] = useState("Studentadmin");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
